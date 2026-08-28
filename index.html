@@ -218,7 +218,7 @@ line-height:1.5;
 
 const WEBAPP_URL =
 "https://script.google.com/macros/s/AKfycbwKxU4hW8buU7vEkAP9AoZijVIWHEX3GL_NZeLwZzR-XvCxfLd3X_PZ0iXtu4IJJT9P2g/exec";
-
+  
 let userName="";
 let userPhone="";
 let userBirth="";
@@ -344,7 +344,7 @@ step = 0;
 renderQuestion();
 
 }
-`
+
 function isValidDate(value){
 const [y,m,d]=value.split(".").map(Number);
 if(!y || m<1 || m>12 || d<1) return false;
@@ -352,39 +352,7 @@ const lastDay=new Date(y,m,0).getDate();
 return d<=lastDay;
 }
 
-function startTest(){
 
-const name=document.getElementById("name").value.trim();
-const birth=document.getElementById("birth").value.trim();
-const phone=document.getElementById("phone").value.trim();
-
-const phonePattern=/^010-\d{4}-\d{4}$/;
-const birthPattern=/^\d{4}\.\d{2}\.\d{2}$/;
-
-if(!name){
-alert("이름을 입력해주세요.");
-return;
-}
-
-if(!birthPattern.test(birth) || !isValidDate(birth)){
-alert("생년월일을 실제 존재하는 날짜로 입력해주세요.\n예: 2004.03.21");
-return;
-}
-
-if(!phonePattern.test(phone)){
-alert("010-0000-0000 형식으로 입력해주세요.");
-return;
-}
-
-userName=name;
-userBirth=birth;
-userPhone=phone;
-answers=[];
-step=0;
-
-renderQuestion();
-
-}
 
 function renderQuestion(){
 
@@ -493,20 +461,16 @@ const keys=["FRESH","WOODY","FLORAL","MUSK"];
 
 resultType=keys[idx];
 
-const result=results[resultType];
+const result = results[resultType];
 
-// 테스트만 완료해도 이름/생년월일/연락처/결과를 자동 전송합니다.
-
+app.innerHTML = `
 
 <div class="card">
 
 <img
 class="result-img"
 src="${result.img}"
-alt="${result.title} 향 타입">
-
-<div class="result-title">
-${result.title}
+result.title}
 </div>
 
 <div class="result-desc">
@@ -537,7 +501,7 @@ onclick="restartTest()">
 `;
 
 }
-function showInfoForm(){
+  function showInfoForm(){
 
 app.innerHTML = `
 
