@@ -218,7 +218,7 @@ line-height:1.5;
 
 const WEBAPP_URL =
 "https://script.google.com/macros/s/AKfycbwKxU4hW8buU7vEkAP9AoZijVIWHEX3GL_NZeLwZzR-XvCxfLd3X_PZ0iXtu4IJJT9P2g/exec";
-  
+
 let userName="";
 let userPhone="";
 let userBirth="";
@@ -326,22 +326,33 @@ app.innerHTML=`
 나에게 어울리는 퍼스널 향을 찾아보세요.
 </p>
 
+<input id="name" placeholder="이름">
+
+<input
+id="birth"
+maxlength="10"
+inputmode="numeric"
+placeholder="생년월일 0000.00.00">
+<div class="birth-hint">예: 2004.03.21 · 실제 존재하는 날짜만 입력해주세요.</div>
+
+<input
+id="phone"
+maxlength="13"
+inputmode="numeric"
+placeholder="010-0000-0000">
+
 <button class="btn"
-onclick="beginTest()">
+onclick="startTest()">
 START →
 </button>
+
+<div class="small">
+이름·생년월일·연락처는 테스트 참여 및 향 추천 결과 확인을 위해 사용됩니다.
+</div>
 
 </div>
 
 `;
-
-}
-function beginTest(){
-
-answers = [];
-step = 0;
-
-renderQuestion();
 
 }
 
@@ -352,7 +363,39 @@ const lastDay=new Date(y,m,0).getDate();
 return d<=lastDay;
 }
 
+function startTest(){
 
+const name=document.getElementById("name").value.trim();
+const birth=document.getElementById("birth").value.trim();
+const phone=document.getElementById("phone").value.trim();
+
+const phonePattern=/^010-\d{4}-\d{4}$/;
+const birthPattern=/^\d{4}\.\d{2}\.\d{2}$/;
+
+if(!name){
+alert("이름을 입력해주세요.");
+return;
+}
+
+if(!birthPattern.test(birth) || !isValidDate(birth)){
+alert("생년월일을 실제 존재하는 날짜로 입력해주세요.\n예: 2004.03.21");
+return;
+}
+
+if(!phonePattern.test(phone)){
+alert("010-0000-0000 형식으로 입력해주세요.");
+return;
+}
+
+userName=name;
+userBirth=birth;
+userPhone=phone;
+answers=[];
+step=0;
+
+renderQuestion();
+
+}
 
 function renderQuestion(){
 
@@ -461,16 +504,22 @@ const keys=["FRESH","WOODY","FLORAL","MUSK"];
 
 resultType=keys[idx];
 
-const result = results[resultType];
+const result=results[resultType];
 
-app.innerHTML = `
+// 테스트만 완료해도 이름/생년월일/연락처/결과를 자동 전송합니다.
+sendTestLead();
+
+app.innerHTML=`
 
 <div class="card">
 
 <img
 class="result-img"
 src="${result.img}"
-result.title}
+alt="${result.title} 향 타입">
+
+<div class="result-title">
+${result.title}
 </div>
 
 <div class="result-desc">
@@ -487,7 +536,7 @@ ${result.note}
 </div>
 
 <button class="btn"
-onclick="showInfoForm()">
+onclick="showReservation()">
 🌿 나의 향 직접 시향하기
 </button>
 
@@ -501,51 +550,7 @@ onclick="restartTest()">
 `;
 
 }
-  function showInfoForm(){
 
-app.innerHTML = `
-
-<div class="card">
-
-<h2>시향 예약 신청</h2>
-
-<br>
-
-<input
-id="name"
-placeholder="이름">
-
-<input
-id="birth"
-maxlength="10"
-inputmode="numeric"
-placeholder="생년월일 0000.00.00">
-
-<div class="birth-hint">
-예: 2004.03.21
-</div>
-
-<input
-id="phone"
-maxlength="13"
-inputmode="numeric"
-placeholder="010-0000-0000">
-
-<button class="btn"
-onclick="saveUserInfo()">
-다음 →
-</button>
-
-<button class="back"
-onclick="showResultAgain()">
-← 결과로 돌아가기
-</button>
-
-</div>
-
-`;
-
-}
 function showReservation(){
 
 selectedDay="";
@@ -617,51 +622,6 @@ onclick="submitReservation()">
 
 }
 
-  function saveUserInfo(){
-
-const name =
-document.getElementById("name").value.trim();
-
-const birth =
-document.getElementById("birth").value.trim();
-
-const phone =
-document.getElementById("phone").value.trim();
-
-const phonePattern =
-/^010-\d{4}-\d{4}$/;
-
-const birthPattern =
-/^\d{4}\.\d{2}\.\d{2}$/;
-
-if(!name){
-alert("이름을 입력해주세요.");
-return;
-}
-
-if(
-!birthPattern.test(birth) ||
-!isValidDate(birth)
-){
-alert("생년월일을 확인해주세요.");
-return;
-}
-
-if(!phonePattern.test(phone)){
-alert("010-0000-0000 형식으로 입력해주세요.");
-return;
-}
-
-userName = name;
-userBirth = birth;
-userPhone = phone;
-
-sendTestLead();
-
-showReservation();
-
-}
-  
 function chooseDay(day,id){
 
 selectedDay=day;
